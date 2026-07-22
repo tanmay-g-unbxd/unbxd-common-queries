@@ -303,7 +303,7 @@ with dateQueryLevel as  (
         MAX(COALESCE(CAST(JSON_EXTRACT(searchResponse,"$['mimirDebug']['metadata']['semantic_search']['numberOfProducts']") as INT64),0)) AS semantic_search_numberOfProducts,
         max(JSON_EXTRACT(searchResponse,"$['mimirDebug']['metadata']['semantic_search']['query']")) as ss_query
 
-       FROM events.{api_key}
+       FROM search.{api_key}
         WHERE  
           DATE(_PARTITIONTIME) >= '{start_date}'
    AND DATE(_PARTITIONTIME) <= '{end_date}'
