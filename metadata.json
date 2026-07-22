@@ -1,0 +1,6 @@
+{
+  "name": "Unbxd API Key Lookup",
+  "description": "A dashboard for Unbxd teams to fetch, copy, and manage API keys using Site Keys.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
