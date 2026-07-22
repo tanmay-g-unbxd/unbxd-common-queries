@@ -13,7 +13,7 @@ export const INITIAL_TEMPLATES: QueryTemplate[] = [
     defaultSql: `SELECT
   dt,
   visit_type,
-  CASE
+  CASE 
     WHEN session_type LIKE '%search%' AND session_type IS NOT NULL THEN 'Visits With Site Search'
     WHEN session_type NOT LIKE '%search%' OR session_type IS NULL THEN 'Visits Without Site Search'
     ELSE 'other'
@@ -37,7 +37,7 @@ export const INITIAL_TEMPLATES: QueryTemplate[] = [
   SUM(prodView) AS prodView
 
 FROM (
-  SELECT
+  SELECT 
     DATE(_PARTITIONTIME) AS dt,
     JSON_EXTRACT(payload, '$.visit_id') AS visit_id,
     visit_type,
@@ -60,7 +60,7 @@ FROM (
     SUM(CASE WHEN event_type = 'ORDER' THEN quantity ELSE 0 END) AS Units,
     SUM(CASE WHEN event_type = 'CART' THEN quantity ELSE 0 END) AS Carts_quantity,
 
-    COUNT(DISTINCT CASE
+    COUNT(DISTINCT CASE 
       WHEN event_type = 'ORDER'
         AND JSON_EXTRACT(payload, '$.visit_id') IS NOT NULL
         AND JSON_EXTRACT(payload, '$.visit_id') != 'unknown'
@@ -70,11 +70,11 @@ FROM (
     SUM(CASE WHEN event_type = 'PRODUCT_IMPRESSIONS' THEN 1 ELSE 0 END) AS impressions,
     SUM(CASE WHEN event_type = 'PRODUCT_PAGE_VIEW' THEN 1 ELSE 0 END) AS prodView
 
-  FROM \`Autosuggest accounts for only ~2% of total hits but contributes over 50% of total revenue, demonstrating significantly higher monetization efficiency than Normal Search..{api_key}\`
+  FROM events.{api_key} -- Insert API key
 
-  WHERE i_site_name = '{site_key}'
-    AND ((source = TRUE) OR (source = FALSE AND enriched = TRUE))
-    AND terminated = FALSE
+  WHERE i_site_name = '{site_key}' -- Insert Site key
+    AND ((source = TRUE) OR (source = FALSE AND enriched = TRUE)) 
+    AND terminated = FALSE 
     AND _PARTITIONTIME >= TIMESTAMP('{start_date}')
     AND _PARTITIONTIME <= TIMESTAMP('{end_date}')
 
