@@ -303,17 +303,18 @@ with dateQueryLevel as  (
         MAX(COALESCE(CAST(JSON_EXTRACT(searchResponse,"$['mimirDebug']['metadata']['semantic_search']['numberOfProducts']") as INT64),0)) AS semantic_search_numberOfProducts,
         max(JSON_EXTRACT(searchResponse,"$['mimirDebug']['metadata']['semantic_search']['query']")) as ss_query
 
-       FROM search.469db04b38cc424c9e75aba297f12a15
+       FROM events.{api_key}
         WHERE  
-           DATE(_PARTITIONTIME) >= '{start_date}'
+          DATE(_PARTITIONTIME) >= '{start_date}'
    AND DATE(_PARTITIONTIME) <= '{end_date}'
-            and iSiteName = 'ss-unbxd-auk-prod-Officelondon58431741769749'
+
+            and iSiteName = '{site_key}' -- Insert Site key
              AND 
              ruleSetName = "search"
             AND statusCode = 0
         and JSON_EXTRACT(searchResponse,"$['mimirDebug']['metadata']['original']['redirect']") IS NULL 
-        and JSON_EXTRACT(searchResponse,"$['mimirDebug']['metadata']['original']['query']") IS NOT NULL 
-        and JSON_EXTRACT(searchResponse,"$['mimirDebug']['metadata']['original']['query']") <> '"*"'
+        AND JSON_EXTRACT(searchResponse,"$['mimirDebug']['metadata']['original']['query']") IS NOT NULL 
+        AND JSON_EXTRACT(searchResponse,"$['mimirDebug']['metadata']['original']['query']") <> '"*"'
 GROUP BY 1, 2
 ),
 
@@ -324,8 +325,9 @@ searchesTable as (
                     ,sum(CASE WHEN event_type = "SEARCH" THEN 1 ELSE 0 END) AS searches   
           FROM events.{api_key}
   WHERE 
-           DATE(_PARTITIONTIME) >= '{start_date}'
+      DATE(_PARTITIONTIME) >= '{start_date}'
    AND DATE(_PARTITIONTIME) <= '{end_date}'
+
    AND 
     terminated = FALSE
     AND ((source = TRUE) OR (source = FALSE AND enriched = TRUE))
@@ -343,8 +345,7 @@ limitsTable as (
     WHEN percentile <= 1 THEN 'Head'
     WHEN percentile >= 5 THEN 'Tail'
     ELSE 'Torso' end as freq,
-    
-          
+        
   from (select *, NTILE(16) OVER (ORDER BY hits DESC) AS percentile, 
  FROM searchesTable)
 )
@@ -389,8 +390,9 @@ and terminated = false
 and session_type = 'search'
 and i_site_name ='{site_key}' -- insert site key
 and (autoSuggestType != 'POPULAR_PRODUCTS' or autoSuggestType is NULL)
-and            DATE(_PARTITIONTIME) >= '{start_date}'
+and DATE(_PARTITIONTIME) >= '{start_date}'
    AND DATE(_PARTITIONTIME) <= '{end_date}'
+
 GROUP BY 1,2,3
 ),
 
